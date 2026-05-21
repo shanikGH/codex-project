@@ -1,83 +1,84 @@
-# palatenco228 Twitch Hub
+# palatenco228 YouTube Hub
 
-Mini site for Twitch channel `palatenco228`: hero section, clips, stream archives, Twitch/YouTube links, and optional Twitch Helix API proxy.
+Красно-белый сайт для YouTube-канала: главный экран, статистика, последние видео, короткие ролики и ссылки.
 
-## Local Run
+## Запуск локально
 
 ```powershell
 npm install
 npm start
 ```
 
-Open:
+Открыть:
 
 ```text
 http://localhost:3000
 ```
 
-If port `3000` is busy:
+Если порт занят:
 
 ```powershell
 $env:PORT="3001"
 npm start
 ```
 
-## Twitch API
+## YouTube API
 
-Keep `TWITCH_CLIENT_SECRET` only on the Node.js server. Do not put it into frontend files.
+API-ключ хранится только на Node.js сервере:
 
 ```powershell
-$env:TWITCH_LOGIN="palatenco228"
-$env:TWITCH_CLIENT_ID="your_client_id"
-$env:TWITCH_CLIENT_SECRET="your_client_secret"
+$env:YOUTUBE_API_KEY="your_api_key"
+$env:YOUTUBE_CHANNEL_HANDLE="@palatenco228"
 npm start
 ```
 
-The server uses Twitch Helix:
+Можно использовать channel id вместо handle:
 
-- `/helix/users` to get `broadcaster_id`
-- `/helix/streams` for live status
-- `/helix/clips` for clips
-- `/helix/videos` for stream archives
+```powershell
+$env:YOUTUBE_CHANNEL_ID="UC..."
+```
 
-## Render Backend + Sprinthosting Frontend
+Серверные API:
 
-Deploy the full project to Render as a Web Service:
+- `/api/youtube/channel`
+- `/api/youtube/videos?limit=10`
 
-- Environment: `Node`
-- Build command: `npm install`
-- Start command: `npm start`
+## Render backend + статический фронтенд
 
-Add Render environment variables:
+На Render загружается весь проект:
 
 ```text
-TWITCH_LOGIN=palatenco228
-TWITCH_CLIENT_ID=your_client_id
-TWITCH_CLIENT_SECRET=your_client_secret
+public/
+server.js
+package.json
+package-lock.json
+README.md
+```
+
+Render settings:
+
+```text
+Environment: Node
+Build command: npm install
+Start command: npm start
+```
+
+Environment variables:
+
+```text
+YOUTUBE_API_KEY=your_api_key
+YOUTUBE_CHANNEL_HANDLE=@palatenco228
 CORS_ORIGIN=https://your-domain.ru
 ```
 
-Render will provide a URL like:
-
-```text
-https://your-service.onrender.com
-```
-
-For Sprinthosting static frontend, upload only the `public` folder contents to `public_html`.
-
-Before uploading, edit `public/config.js`:
+Если фронтенд лежит отдельно на Sprinthosting, залей содержимое папки `public` в `public_html`, а в `public/config.js` пропиши адрес Render:
 
 ```js
-window.CHANNEL_CONFIG = {
-  twitchLogin: "palatenco228",
-  twitchUrl: "https://www.twitch.tv/palatenco228",
-  youtubeUrl: "#",
-  apiBaseUrl: "https://your-service.onrender.com",
-};
+apiBaseUrl: "https://your-service.onrender.com",
 ```
 
-If frontend and backend are on the same Render service, leave `apiBaseUrl` empty.
+Если фронтенд и backend живут вместе на Render, оставь:
 
-## YouTube
-
-When the YouTube channel is ready, replace `youtubeUrl` in `public/config.js`.
+```js
+apiBaseUrl: "",
+```

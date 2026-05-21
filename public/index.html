@@ -3,125 +3,123 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta
-      name="description"
-      content="Фан-сайт Twitch канала palatenco228: клипы, стримы, соцсети и расписание."
-    />
-    <title>palatenco228 | Twitch Hub</title>
+    <meta name="description" content="YouTube hub канала palatenco228: новые видео, короткие ролики, статистика и ссылки." />
+    <title>palatenco228 | YouTube Hub</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <header class="site-header">
       <a class="brand" href="#top" aria-label="palatenco228">
-        <span class="brand-mark">P</span>
+        <span class="brand-mark">▶</span>
         <span>palatenco228</span>
       </a>
-      <nav class="nav" aria-label="Основная навигация">
-        <a href="#clips">Клипы</a>
-        <a href="#streams">Стримы</a>
+      <nav class="nav" aria-label="Навигация">
+        <a href="#videos">Видео</a>
+        <a href="#shorts">Shorts</a>
+        <a href="#about">Канал</a>
         <a href="#links">Ссылки</a>
-        <a href="#schedule">Расписание</a>
       </nav>
     </header>
 
     <main id="top">
-      <section class="hero section-band">
+      <section class="hero">
         <div class="hero-copy">
-          <p class="eyebrow">Twitch channel</p>
-          <h1>palatenco228</h1>
-          <p class="hero-text">
-            Место для лучших моментов, новых стримов и быстрых ссылок на весь контент.
+          <p class="eyebrow">YouTube channel</p>
+          <h1 id="channelTitle">palatenco228</h1>
+          <p id="channelDescription" class="hero-text">
+            Красивый хаб для канала: свежие видео, быстрые ссылки и место под будущие рубрики.
           </p>
-          <div class="hero-actions" aria-label="Основные действия">
-            <a class="button button-primary" href="https://www.twitch.tv/palatenco228" target="_blank" rel="noreferrer">
+          <div class="hero-actions">
+            <a id="youtubeButton" class="button button-primary" href="#" target="_blank" rel="noreferrer">
               <span aria-hidden="true">▶</span>
-              Открыть Twitch
+              Открыть YouTube
             </a>
-            <a class="button button-ghost" href="#clips">
+            <a class="button button-light" href="#videos">
               <span aria-hidden="true">▦</span>
-              Смотреть клипы
+              Смотреть видео
             </a>
           </div>
         </div>
 
-        <aside class="channel-panel" aria-label="Статус канала">
-          <div class="avatar" aria-hidden="true">P</div>
+        <aside class="channel-card" aria-label="Информация о канале">
+          <div id="avatar" class="avatar" aria-hidden="true">P</div>
           <div>
-            <p class="panel-label">Канал</p>
-            <h2>palatenco228</h2>
-            <p id="liveStatus" class="live-status">Проверяем статус...</p>
+            <p class="card-label">Канал</p>
+            <h2 id="cardTitle">palatenco228</h2>
+            <p id="apiStatus" class="status">Ждем данные YouTube API...</p>
           </div>
-          <div class="mini-stats" aria-label="Краткая статистика">
-            <span><strong id="clipCount">6</strong> клипов</span>
-            <span><strong id="vodCount">4</strong> стрима</span>
+          <div class="stats">
+            <span><strong id="subscriberCount">-</strong> подписчиков</span>
+            <span><strong id="videoCount">-</strong> видео</span>
+            <span><strong id="viewCount">-</strong> просмотров</span>
           </div>
         </aside>
       </section>
 
-      <section id="clips" class="content-section">
+      <section id="videos" class="content-section">
         <div class="section-heading">
-          <p class="eyebrow">Highlights</p>
-          <h2>Клипы</h2>
+          <p class="eyebrow">Latest uploads</p>
+          <h2>Последние видео</h2>
         </div>
-        <div id="clipsGrid" class="media-grid" aria-live="polite"></div>
+        <div id="videosGrid" class="media-grid" aria-live="polite"></div>
       </section>
 
-      <section id="streams" class="content-section section-band muted">
+      <section id="shorts" class="content-section red-band">
         <div class="section-heading">
-          <p class="eyebrow">VOD</p>
-          <h2>Стримы</h2>
+          <p class="eyebrow light">Fast cuts</p>
+          <h2>Короткие ролики</h2>
         </div>
-        <div id="streamsGrid" class="media-grid stream-grid" aria-live="polite"></div>
+        <div id="shortsGrid" class="media-grid compact-grid" aria-live="polite"></div>
       </section>
 
-      <section id="links" class="content-section">
-        <div class="section-heading">
-          <p class="eyebrow">Follow</p>
-          <h2>YouTube и Twitch</h2>
-        </div>
-        <div class="link-grid">
-          <a class="social-tile twitch-tile" href="https://www.twitch.tv/palatenco228" target="_blank" rel="noreferrer">
-            <span class="tile-icon" aria-hidden="true">▶</span>
-            <span>
-              <strong>Twitch</strong>
-              <small>Прямые эфиры и чат</small>
-            </span>
-          </a>
-          <a id="youtubeLink" class="social-tile youtube-tile" href="#" target="_blank" rel="noreferrer">
-            <span class="tile-icon" aria-hidden="true">▷</span>
-            <span>
-              <strong>YouTube</strong>
-              <small>Видео, нарезки и архивы</small>
-            </span>
-          </a>
-        </div>
-      </section>
-
-      <section id="schedule" class="content-section section-band">
-        <div class="section-heading">
-          <p class="eyebrow">Next up</p>
-          <h2>Что дальше</h2>
+      <section id="about" class="content-section split-section">
+        <div>
+          <p class="eyebrow">Channel vibe</p>
+          <h2>Что можно добавить дальше</h2>
         </div>
         <div class="feature-grid">
           <article class="feature-card">
-            <h3>Расписание</h3>
-            <p>Сюда можно поставить дни стримов, таймер до эфира и статус “онлайн”.</p>
+            <h3>Плейлисты</h3>
+            <p>Отдельные подборки по рубрикам: лучшие моменты, реакции, гайды, нарезки.</p>
           </article>
           <article class="feature-card">
-            <h3>Топ моменты</h3>
-            <p>Отдельный блок для лучших клипов месяца, выбранных вручную или через API.</p>
+            <h3>Топ видео</h3>
+            <p>Блок для роликов с лучшими просмотрами, лайками или выбранных вручную.</p>
           </article>
           <article class="feature-card">
-            <h3>Комьюнити</h3>
-            <p>Место под Discord, донаты, правила чата и любые ссылки, которые нужны зрителям.</p>
+            <h3>Анонсы</h3>
+            <p>Место под расписание, премьеры, новые серии и важные обновления канала.</p>
           </article>
+        </div>
+      </section>
+
+      <section id="links" class="content-section link-section">
+        <div class="section-heading">
+          <p class="eyebrow">Follow</p>
+          <h2>Ссылки</h2>
+        </div>
+        <div class="link-grid">
+          <a id="youtubeTile" class="social-tile" href="#" target="_blank" rel="noreferrer">
+            <span class="tile-icon" aria-hidden="true">▶</span>
+            <span>
+              <strong>YouTube</strong>
+              <small>Основной канал</small>
+            </span>
+          </a>
+          <a id="telegramTile" class="social-tile pale" href="#" target="_blank" rel="noreferrer">
+            <span class="tile-icon" aria-hidden="true">↗</span>
+            <span>
+              <strong>Telegram</strong>
+              <small>Можно подключить позже</small>
+            </span>
+          </a>
         </div>
       </section>
     </main>
 
     <footer class="footer">
-      <span>palatenco228 hub</span>
-      <a href="https://www.twitch.tv/palatenco228" target="_blank" rel="noreferrer">twitch.tv/palatenco228</a>
+      <span>palatenco228 YouTube Hub</span>
+      <span>Powered by YouTube Data API</span>
     </footer>
 
     <script src="./config.js"></script>

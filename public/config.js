@@ -1,6 +1,6 @@
 window.CHANNEL_CONFIG = {
-  twitchLogin: "palatenco228",
-  twitchUrl: "https://www.twitch.tv/palatenco228",
-  youtubeUrl: "#",
+  channelHandle: "@palatenco228",
+  youtubeUrl: "https://www.youtube.com/@palatenco228/shorts",
+  telegramUrl: "#",
   apiBaseUrl: "",
 };

@@ -1,7 +1,7 @@
 {
-  "name": "palatenco228-twitch-hub",
+  "name": "palatenco228-youtube-hub",
   "version": "1.0.0",
-  "description": "Twitch hub site for palatenco228 with optional Twitch Helix API proxy.",
+  "description": "YouTube hub site for palatenco228 with optional YouTube Data API backend.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

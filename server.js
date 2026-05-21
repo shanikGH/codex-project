@@ -1,18 +1,21 @@
 const http = require("http");
 const https = require("https");
 const fs = require("fs").promises;
+const fsSync = require("fs");
 const path = require("path");
+
+loadEnvFile(path.join(__dirname, ".env"));
 
 const PORT = Number(process.env.PORT || 3000);
 const HOST = process.env.HOST || "0.0.0.0";
 const PUBLIC_DIR = path.join(__dirname, "public");
-const TWITCH_LOGIN = process.env.TWITCH_LOGIN || "palatenco228";
-const TWITCH_CLIENT_ID = process.env.TWITCH_CLIENT_ID || "";
-const TWITCH_CLIENT_SECRET = process.env.TWITCH_CLIENT_SECRET || "";
+const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY || "";
+const YOUTUBE_CHANNEL_HANDLE = process.env.YOUTUBE_CHANNEL_HANDLE || "@palatenco228";
+const YOUTUBE_CHANNEL_ID = process.env.YOUTUBE_CHANNEL_ID || "";
 const CORS_ORIGIN = process.env.CORS_ORIGIN || "*";
 
-let tokenCache = null;
-let userCache = null;
+let channelCache = null;
+let videosCache = null;
 
 const contentTypes = {
   ".html": "text/html; charset=utf-8",
@@ -26,13 +29,23 @@ const contentTypes = {
   ".webp": "image/webp",
 };
 
-function json(res, status, payload) {
-  res.writeHead(status, {
-    "content-type": "application/json; charset=utf-8",
-    "cache-control": "no-store",
-    ...corsHeaders(),
+function loadEnvFile(filePath) {
+  if (!fsSync.existsSync(filePath)) return;
+
+  const lines = fsSync.readFileSync(filePath, "utf8").split(/\r?\n/);
+  lines.forEach((line) => {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) return;
+
+    const separator = trimmed.indexOf("=");
+    if (separator === -1) return;
+
+    const key = trimmed.slice(0, separator).trim().replace(/^\uFEFF/, "");
+    const value = trimmed.slice(separator + 1).trim().replace(/^["']|["']$/g, "");
+    if (key && process.env[key] === undefined) {
+      process.env[key] = value;
+    }
   });
-  res.end(JSON.stringify(payload));
 }
 
 function corsHeaders() {
@@ -43,150 +56,192 @@ function corsHeaders() {
   };
 }
 
-function hasTwitchCredentials() {
-  return Boolean(TWITCH_CLIENT_ID && TWITCH_CLIENT_SECRET);
+function json(res, status, payload) {
+  res.writeHead(status, {
+    "content-type": "application/json; charset=utf-8",
+    "cache-control": "no-store",
+    ...corsHeaders(),
+  });
+  res.end(JSON.stringify(payload));
 }
 
-async function getAppToken() {
-  if (tokenCache && tokenCache.expiresAt > Date.now() + 60000) {
-    return tokenCache.value;
-  }
+function requestJson(url) {
+  return new Promise((resolve, reject) => {
+    const target = typeof url === "string" ? new URL(url) : url;
+    const request = https.request(target, { method: "GET" }, (response) => {
+      let data = "";
 
-  const params = new URLSearchParams({
-    client_id: TWITCH_CLIENT_ID,
-    client_secret: TWITCH_CLIENT_SECRET,
-    grant_type: "client_credentials",
-  });
+      response.setEncoding("utf8");
+      response.on("data", (chunk) => {
+        data += chunk;
+      });
+      response.on("end", () => {
+        let body = {};
 
-  const body = await requestJson(`https://id.twitch.tv/oauth2/token?${params.toString()}`, {
-    method: "POST",
+        try {
+          body = data ? JSON.parse(data) : {};
+        } catch (error) {
+          reject(new Error(`Invalid JSON response from ${target.hostname}`));
+          return;
+        }
+
+        if (response.statusCode < 200 || response.statusCode >= 300) {
+          const message =
+            body.error?.message ||
+            body.error?.errors?.[0]?.reason ||
+            body.error?.status ||
+            `Request to ${target.hostname} failed with ${response.statusCode}`;
+          reject(new Error(message));
+          return;
+        }
+
+        resolve(body);
+      });
+    });
+
+    request.on("error", reject);
+    request.end();
   });
-  tokenCache = {
-    value: body.access_token,
-    expiresAt: Date.now() + Number(body.expires_in || 3600) * 1000,
-  };
-  return tokenCache.value;
 }
 
-async function twitchRequest(endpoint, query = {}) {
-  if (!hasTwitchCredentials()) {
-    const error = new Error("Twitch credentials are not configured");
+function requireApiKey() {
+  if (!YOUTUBE_API_KEY) {
+    const error = new Error("YOUTUBE_API_KEY is not configured");
     error.statusCode = 503;
     throw error;
   }
+}
 
-  const token = await getAppToken();
-  const url = new URL(`https://api.twitch.tv/helix/${endpoint}`);
-  Object.entries(query).forEach(([key, value]) => {
+async function youtubeRequest(endpoint, params = {}) {
+  requireApiKey();
+  const url = new URL(`https://www.googleapis.com/youtube/v3/${endpoint}`);
+  Object.entries({ ...params, key: YOUTUBE_API_KEY }).forEach(([key, value]) => {
     if (value !== undefined && value !== null && value !== "") {
       url.searchParams.set(key, String(value));
     }
   });
+  return requestJson(url);
+}
 
-  return requestJson(url, {
-    headers: {
-      "Client-Id": TWITCH_CLIENT_ID,
-      Authorization: `Bearer ${token}`,
+function bestThumbnail(thumbnails = {}) {
+  return (
+    thumbnails.maxres?.url ||
+    thumbnails.standard?.url ||
+    thumbnails.high?.url ||
+    thumbnails.medium?.url ||
+    thumbnails.default?.url ||
+    ""
+  );
+}
+
+function channelUrl(channel) {
+  if (channel?.snippet?.customUrl) return `https://www.youtube.com/${channel.snippet.customUrl}`;
+  if (YOUTUBE_CHANNEL_HANDLE) return `https://www.youtube.com/${YOUTUBE_CHANNEL_HANDLE}`;
+  return `https://www.youtube.com/channel/${channel.id}`;
+}
+
+async function getChannel() {
+  if (channelCache && channelCache.expiresAt > Date.now()) {
+    return channelCache.value;
+  }
+
+  const params = {
+    part: "snippet,statistics,contentDetails",
+  };
+
+  if (YOUTUBE_CHANNEL_ID) {
+    params.id = YOUTUBE_CHANNEL_ID;
+  } else {
+    params.forHandle = YOUTUBE_CHANNEL_HANDLE;
+  }
+
+  const response = await youtubeRequest("channels", params);
+  const channel = response.items?.[0];
+  if (!channel) throw new Error("YouTube channel was not found");
+
+  const normalized = {
+    id: channel.id,
+    title: channel.snippet?.title || "YouTube channel",
+    description: channel.snippet?.description || "",
+    thumbnail: bestThumbnail(channel.snippet?.thumbnails),
+    url: channelUrl(channel),
+    uploadsPlaylistId: channel.contentDetails?.relatedPlaylists?.uploads || "",
+    statistics: {
+      subscriberCount: Number(channel.statistics?.subscriberCount || 0),
+      videoCount: Number(channel.statistics?.videoCount || 0),
+      viewCount: Number(channel.statistics?.viewCount || 0),
     },
+  };
+
+  channelCache = {
+    value: normalized,
+    expiresAt: Date.now() + 1000 * 60 * 10,
+  };
+  return normalized;
+}
+
+async function getVideos(limit = 10) {
+  if (videosCache && videosCache.expiresAt > Date.now() && videosCache.limit >= limit) {
+    return videosCache.value.slice(0, limit);
+  }
+
+  const channel = await getChannel();
+  if (!channel.uploadsPlaylistId) return [];
+
+  const playlistItems = await youtubeRequest("playlistItems", {
+    part: "snippet,contentDetails",
+    playlistId: channel.uploadsPlaylistId,
+    maxResults: Math.min(Math.max(limit, 1), 20),
   });
-}
 
-function requestJson(url, options = {}) {
-  return new Promise((resolve, reject) => {
-    const target = typeof url === "string" ? new URL(url) : url;
-    const request = https.request(
-      target,
-      {
-        method: options.method || "GET",
-        headers: options.headers || {},
-      },
-      (response) => {
-        let data = "";
+  const videoIds = (playlistItems.items || [])
+    .map((item) => item.contentDetails?.videoId)
+    .filter(Boolean);
 
-        response.setEncoding("utf8");
-        response.on("data", (chunk) => {
-          data += chunk;
-        });
-        response.on("end", () => {
-          let body = {};
+  if (!videoIds.length) return [];
 
-          try {
-            body = data ? JSON.parse(data) : {};
-          } catch (error) {
-            reject(new Error(`Invalid JSON response from ${target.hostname}`));
-            return;
-          }
-
-          if (response.statusCode < 200 || response.statusCode >= 300) {
-            reject(new Error(`Request to ${target.hostname} failed with ${response.statusCode}`));
-            return;
-          }
-
-          resolve(body);
-        });
-      },
-    );
-
-    request.on("error", reject);
-    request.end(options.body || undefined);
+  const details = await youtubeRequest("videos", {
+    part: "snippet,statistics,contentDetails",
+    id: videoIds.join(","),
+    maxResults: videoIds.length,
   });
+
+  const videos = (details.items || []).map((video) => ({
+    id: video.id,
+    title: video.snippet?.title || "YouTube video",
+    description: video.snippet?.description || "",
+    thumbnail: bestThumbnail(video.snippet?.thumbnails),
+    publishedAt: video.snippet?.publishedAt || "",
+    viewCount: Number(video.statistics?.viewCount || 0),
+    likeCount: Number(video.statistics?.likeCount || 0),
+    duration: video.contentDetails?.duration || "",
+    url: `https://www.youtube.com/watch?v=${video.id}`,
+  }));
+
+  videosCache = {
+    value: videos,
+    limit,
+    expiresAt: Date.now() + 1000 * 60 * 5,
+  };
+  return videos;
 }
 
-async function getChannelUser() {
-  if (userCache) return userCache;
-  const users = await twitchRequest("users", { login: TWITCH_LOGIN });
-  const user = users.data?.[0];
-  if (!user) throw new Error(`Twitch user ${TWITCH_LOGIN} was not found`);
-  userCache = user;
-  return user;
-}
-
-async function handleTwitchApi(req, res, url) {
+async function handleYoutubeApi(req, res, url) {
   try {
-    if (url.pathname === "/api/twitch/summary") {
-      const user = await getChannelUser();
-      const streams = await twitchRequest("streams", { user_login: TWITCH_LOGIN });
-      const live = streams.data?.[0] || null;
-      return json(res, 200, {
-        id: user.id,
-        login: user.login,
-        displayName: user.display_name,
-        profileImage: user.profile_image_url,
-        isLive: Boolean(live),
-        title: live?.title || "",
-        gameName: live?.game_name || "",
-        viewerCount: live?.viewer_count || 0,
-      });
+    if (url.pathname === "/api/youtube/channel") {
+      return json(res, 200, await getChannel());
     }
 
-    if (url.pathname === "/api/twitch/clips") {
-      const user = await getChannelUser();
-      const limit = Math.min(Number(url.searchParams.get("limit") || 6), 20);
-      const startedAt = new Date(Date.now() - 1000 * 60 * 60 * 24 * 90).toISOString();
-      const clips = await twitchRequest("clips", {
-        broadcaster_id: user.id,
-        first: limit,
-        started_at: startedAt,
-      });
-      return json(res, 200, clips.data || []);
-    }
-
-    if (url.pathname === "/api/twitch/videos") {
-      const user = await getChannelUser();
-      const limit = Math.min(Number(url.searchParams.get("limit") || 4), 20);
-      const videos = await twitchRequest("videos", {
-        user_id: user.id,
-        first: limit,
-        type: "archive",
-      });
-      return json(res, 200, videos.data || []);
+    if (url.pathname === "/api/youtube/videos") {
+      const limit = Math.min(Number(url.searchParams.get("limit") || 10), 20);
+      return json(res, 200, await getVideos(limit));
     }
 
     return json(res, 404, { error: "Unknown API route" });
   } catch (error) {
     return json(res, error.statusCode || 500, {
       error: error.message,
-      hint: "Set TWITCH_CLIENT_ID and TWITCH_CLIENT_SECRET to enable live Twitch API data.",
+      hint: "Set YOUTUBE_API_KEY and YOUTUBE_CHANNEL_HANDLE or YOUTUBE_CHANNEL_ID on the server.",
     });
   }
 }
@@ -224,8 +279,8 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  if (url.pathname.startsWith("/api/twitch/")) {
-    await handleTwitchApi(req, res, url);
+  if (url.pathname.startsWith("/api/youtube/")) {
+    await handleYoutubeApi(req, res, url);
     return;
   }
 
@@ -233,5 +288,5 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, HOST, () => {
-  console.log(`palatenco228 site: http://${HOST}:${PORT}`);
+  console.log(`palatenco228 YouTube hub: http://${HOST}:${PORT}`);
 });

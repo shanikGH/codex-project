@@ -1,177 +1,210 @@
-const config = window.CHANNEL_CONFIG ?? {};
+const config = window.CHANNEL_CONFIG || {};
 const API_BASE_URL = (config.apiBaseUrl || "").replace(/\/$/, "");
 
-const mockClips = [
-  {
-    title: "Лучший момент стрима",
-    creator_name: "chat",
-    view_count: 1280,
-    duration: 31,
-    url: config.twitchUrl,
-    thumbnail_url: "",
+const mockChannel = {
+  title: "palatenco228",
+  description: "Красно-белый YouTube hub для свежих роликов, Shorts и будущих рубрик канала.",
+  url: config.youtubeUrl,
+  thumbnail: "",
+  statistics: {
+    subscriberCount: 2280,
+    videoCount: 24,
+    viewCount: 142800,
   },
-  {
-    title: "Реакция, которую надо пересмотреть",
-    creator_name: "viewer",
-    view_count: 940,
-    duration: 24,
-    url: config.twitchUrl,
-    thumbnail_url: "",
-  },
-  {
-    title: "Жесткий камбек",
-    creator_name: "palatenco228",
-    view_count: 770,
-    duration: 42,
-    url: config.twitchUrl,
-    thumbnail_url: "",
-  },
-  {
-    title: "Чат не ожидал",
-    creator_name: "community",
-    view_count: 610,
-    duration: 18,
-    url: config.twitchUrl,
-    thumbnail_url: "",
-  },
-  {
-    title: "Минутка хаоса",
-    creator_name: "chat",
-    view_count: 520,
-    duration: 29,
-    url: config.twitchUrl,
-    thumbnail_url: "",
-  },
-  {
-    title: "Финал катки",
-    creator_name: "viewer",
-    view_count: 430,
-    duration: 36,
-    url: config.twitchUrl,
-    thumbnail_url: "",
-  },
-];
+};
 
-const mockStreams = [
+const mockVideos = [
   {
-    title: "Последний стрим",
-    view_count: 2100,
-    duration: "2h 14m",
-    created_at: new Date().toISOString(),
-    url: config.twitchUrl,
-    thumbnail_url: "",
+    id: "demo-1",
+    title: "Новый ролик канала",
+    description: "Главный выпуск недели.",
+    thumbnail: "",
+    publishedAt: new Date().toISOString(),
+    viewCount: 8200,
+    likeCount: 640,
+    duration: "PT8M12S",
+    url: config.youtubeUrl,
   },
   {
-    title: "Вечерний эфир",
-    view_count: 1740,
-    duration: "1h 58m",
-    created_at: new Date(Date.now() - 86400000 * 2).toISOString(),
-    url: config.twitchUrl,
-    thumbnail_url: "",
+    id: "demo-2",
+    title: "Лучшие моменты",
+    description: "Нарезка самых ярких сцен.",
+    thumbnail: "",
+    publishedAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+    viewCount: 6100,
+    likeCount: 480,
+    duration: "PT5M44S",
+    url: config.youtubeUrl,
   },
   {
-    title: "Лучшие моменты недели",
-    view_count: 1320,
-    duration: "3h 05m",
-    created_at: new Date(Date.now() - 86400000 * 5).toISOString(),
-    url: config.twitchUrl,
-    thumbnail_url: "",
+    id: "demo-3",
+    title: "Реакция на тренд",
+    description: "Коротко, громко, по делу.",
+    thumbnail: "",
+    publishedAt: new Date(Date.now() - 86400000 * 5).toISOString(),
+    viewCount: 4500,
+    likeCount: 390,
+    duration: "PT3M21S",
+    url: config.youtubeUrl,
   },
   {
-    title: "Ночной стрим",
-    view_count: 980,
-    duration: "2h 47m",
-    created_at: new Date(Date.now() - 86400000 * 8).toISOString(),
-    url: config.twitchUrl,
-    thumbnail_url: "",
+    id: "demo-4",
+    title: "Выпуск для своих",
+    description: "То, что зрители просили давно.",
+    thumbnail: "",
+    publishedAt: new Date(Date.now() - 86400000 * 7).toISOString(),
+    viewCount: 3300,
+    likeCount: 260,
+    duration: "PT11M09S",
+    url: config.youtubeUrl,
+  },
+  {
+    id: "demo-short-1",
+    title: "Shorts: момент дня",
+    description: "Быстрый клип.",
+    thumbnail: "",
+    publishedAt: new Date(Date.now() - 86400000).toISOString(),
+    viewCount: 12100,
+    likeCount: 940,
+    duration: "PT41S",
+    url: config.youtubeUrl,
+  },
+  {
+    id: "demo-short-2",
+    title: "Shorts: реакция",
+    description: "Короткий формат.",
+    thumbnail: "",
+    publishedAt: new Date(Date.now() - 86400000 * 3).toISOString(),
+    viewCount: 9900,
+    likeCount: 710,
+    duration: "PT55S",
+    url: config.youtubeUrl,
   },
 ];
 
 const formatNumber = (value) =>
-  new Intl.NumberFormat("ru-RU", { notation: "compact", maximumFractionDigits: 1 }).format(value || 0);
+  new Intl.NumberFormat("ru-RU", { notation: "compact", maximumFractionDigits: 1 }).format(Number(value) || 0);
 
 const formatDate = (value) =>
   new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "short", year: "numeric" }).format(new Date(value));
 
-const normalizeThumb = (url) => {
-  if (!url) return "";
-  return url.replace("%{width}", "640").replace("%{height}", "360");
-};
+function parseDurationSeconds(duration) {
+  const match = String(duration || "").match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+  if (!match) return 0;
+  return Number(match[1] || 0) * 3600 + Number(match[2] || 0) * 60 + Number(match[3] || 0);
+}
 
-const fallbackMedia = (label) => `
-  <div class="thumb fallback-thumb">
-    <span>${label}</span>
-  </div>
-`;
+function formatDuration(duration) {
+  const total = parseDurationSeconds(duration);
+  if (!total) return "";
+  const hours = Math.floor(total / 3600);
+  const minutes = Math.floor((total % 3600) / 60);
+  const seconds = total % 60;
+  if (hours) return `${hours}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+  return `${minutes}:${String(seconds).padStart(2, "0")}`;
+}
 
-function mediaThumb(item, label) {
-  const thumb = normalizeThumb(item.thumbnail_url);
-  if (!thumb) return fallbackMedia(label);
+function escapeHtml(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
 
+function fallbackThumb(index) {
   return `
-    <div class="thumb" style="background-image: url('${thumb.replaceAll("'", "%27")}')"></div>
+    <div class="thumb fallback-thumb">
+      <span>${String(index + 1).padStart(2, "0")}</span>
+    </div>
   `;
 }
 
-function renderClips(clips) {
-  const grid = document.querySelector("#clipsGrid");
-  grid.innerHTML = clips
-    .map(
-      (clip, index) => `
-        <article class="media-card">
-          <a href="${clip.url || config.twitchUrl}" target="_blank" rel="noreferrer" aria-label="Открыть клип: ${clip.title}">
-            ${mediaThumb(clip, `Clip ${index + 1}`)}
-            <div class="media-body">
-              <h3>${clip.title}</h3>
-              <p>Автор: ${clip.creator_name || "viewer"}</p>
-              <div class="meta-row">
-                <span>${formatNumber(clip.view_count)} просмотров</span>
-                <span>${Math.round(clip.duration || 0)} сек</span>
-              </div>
-            </div>
-          </a>
-        </article>
-      `,
-    )
-    .join("");
-  document.querySelector("#clipCount").textContent = clips.length;
+function renderThumb(video, index) {
+  if (!video.thumbnail) return fallbackThumb(index);
+  return `<div class="thumb" style="background-image:url('${escapeHtml(video.thumbnail)}')"></div>`;
 }
 
-function renderStreams(streams) {
-  const grid = document.querySelector("#streamsGrid");
-  grid.innerHTML = streams
-    .map(
-      (stream, index) => `
-        <article class="media-card">
-          <a href="${stream.url || config.twitchUrl}" target="_blank" rel="noreferrer" aria-label="Открыть стрим: ${stream.title}">
-            ${mediaThumb(stream, `VOD ${index + 1}`)}
-            <div class="media-body">
-              <h3>${stream.title}</h3>
-              <p>${stream.created_at ? formatDate(stream.created_at) : "Архив Twitch"}</p>
-              <div class="meta-row">
-                <span>${formatNumber(stream.view_count)} просмотров</span>
-                <span>${stream.duration || "VOD"}</span>
-              </div>
-            </div>
-          </a>
-        </article>
-      `,
-    )
-    .join("");
-  document.querySelector("#vodCount").textContent = streams.length;
+function renderVideoCard(video, index) {
+  return `
+    <article class="media-card">
+      <a href="${escapeHtml(video.url || config.youtubeUrl)}" target="_blank" rel="noreferrer">
+        ${renderThumb(video, index)}
+        <div class="media-body">
+          <div class="media-kicker">
+            <span>${video.publishedAt ? formatDate(video.publishedAt) : "YouTube"}</span>
+            <span>${formatDuration(video.duration)}</span>
+          </div>
+          <h3>${escapeHtml(video.title)}</h3>
+          <p>${escapeHtml(video.description || "Смотреть на YouTube")}</p>
+          <div class="meta-row">
+            <span>${formatNumber(video.viewCount)} просмотров</span>
+            <span>${formatNumber(video.likeCount)} лайков</span>
+          </div>
+        </div>
+      </a>
+    </article>
+  `;
 }
 
-function renderStatus(summary) {
-  const status = document.querySelector("#liveStatus");
+function setText(selector, value) {
+  const element = document.querySelector(selector);
+  if (element) element.textContent = value;
+}
 
-  if (summary?.isLive) {
-    status.className = "live-status is-live";
-    status.textContent = `Сейчас онлайн: ${summary.title || "стрим идет"}`;
-    return;
+function setLink(selector, url) {
+  const element = document.querySelector(selector);
+  if (!element) return;
+
+  element.href = url || "#";
+  if (!url || url === "#") {
+    element.setAttribute("aria-disabled", "true");
+    element.addEventListener("click", (event) => event.preventDefault());
   }
+}
 
-  status.className = "live-status";
-  status.textContent = "Сейчас офлайн, но клипы уже на месте";
+function renderChannel(channel, fromApi) {
+  const title = channel.title || "palatenco228";
+  const description = channel.description || mockChannel.description;
+  const url = config.youtubeUrl || channel.url;
+
+  setText("#channelTitle", title);
+  setText("#cardTitle", title);
+  setText("#channelDescription", description);
+  setText("#subscriberCount", formatNumber(channel.statistics?.subscriberCount));
+  setText("#videoCount", formatNumber(channel.statistics?.videoCount));
+  setText("#viewCount", formatNumber(channel.statistics?.viewCount));
+  setText("#apiStatus", fromApi ? "Данные подключены через YouTube API" : "Пока показываем демо-данные");
+  setLink("#youtubeButton", url);
+  setLink("#youtubeTile", url);
+  setLink("#telegramTile", config.telegramUrl);
+
+  const avatar = document.querySelector("#avatar");
+  if (!avatar) return;
+
+  if (channel.thumbnail) {
+    avatar.textContent = "";
+    avatar.style.backgroundImage = `url('${channel.thumbnail.replaceAll("'", "%27")}')`;
+    avatar.classList.add("has-image");
+  } else {
+    avatar.textContent = title.trim().charAt(0).toUpperCase() || "P";
+  }
+}
+
+function renderVideos(videos) {
+  const normalized = videos.length ? videos : mockVideos;
+  const shorts = normalized.filter((video) => parseDurationSeconds(video.duration) > 0 && parseDurationSeconds(video.duration) <= 60);
+  const mainVideos = normalized.filter((video) => parseDurationSeconds(video.duration) > 60);
+
+  document.querySelector("#videosGrid").innerHTML = (mainVideos.length ? mainVideos : normalized.slice(0, 4))
+    .slice(0, 6)
+    .map(renderVideoCard)
+    .join("");
+
+  document.querySelector("#shortsGrid").innerHTML = (shorts.length ? shorts : normalized.slice(-3))
+    .slice(0, 4)
+    .map(renderVideoCard)
+    .join("");
 }
 
 async function getJson(path) {
@@ -180,27 +213,20 @@ async function getJson(path) {
   return response.json();
 }
 
-async function loadTwitchData() {
-  const [summaryResult, clipsResult, streamsResult] = await Promise.allSettled([
-    getJson("/api/twitch/summary"),
-    getJson("/api/twitch/clips?limit=6"),
-    getJson("/api/twitch/videos?limit=4"),
-  ]);
-
-  renderStatus(summaryResult.status === "fulfilled" ? summaryResult.value : null);
-  renderClips(clipsResult.status === "fulfilled" && clipsResult.value.length ? clipsResult.value : mockClips);
-  renderStreams(streamsResult.status === "fulfilled" && streamsResult.value.length ? streamsResult.value : mockStreams);
-}
-
-function initLinks() {
-  const youtube = document.querySelector("#youtubeLink");
-  youtube.href = config.youtubeUrl || "#";
-
-  if (!config.youtubeUrl || config.youtubeUrl === "#") {
-    youtube.setAttribute("aria-disabled", "true");
-    youtube.addEventListener("click", (event) => event.preventDefault());
+async function loadData() {
+  try {
+    const [channel, videos] = await Promise.all([
+      getJson("/api/youtube/channel"),
+      getJson("/api/youtube/videos?limit=10"),
+    ]);
+    renderChannel(channel, true);
+    renderVideos(videos);
+  } catch (error) {
+    renderChannel(mockChannel, false);
+    renderVideos(mockVideos);
   }
 }
 
-initLinks();
-loadTwitchData();
+renderChannel(mockChannel, false);
+renderVideos(mockVideos);
+loadData();
