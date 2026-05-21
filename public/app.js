@@ -268,4 +268,10 @@ if (cached) {
   renderChannel(mockChannel, false, "Загружаем данные YouTube API...");
   renderVideos(mockVideos);
 }
+document.addEventListener("DOMContentLoaded", () => {
+  const steamButton = document.getElementById("steam-button");
+  if (steamButton && window.CHANNEL_CONFIG.steamUrl) {
+    steamButton.href = window.CHANNEL_CONFIG.steamUrl;
+  }
+});
 loadData();
