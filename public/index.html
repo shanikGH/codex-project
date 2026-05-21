@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Фан-сайт Twitch канала palatenco228: клипы, стримы, соцсети и расписание."
+    />
+    <title>palatenco228 | Twitch Hub</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="palatenco228">
+        <span class="brand-mark">P</span>
+        <span>palatenco228</span>
+      </a>
+      <nav class="nav" aria-label="Основная навигация">
+        <a href="#clips">Клипы</a>
+        <a href="#streams">Стримы</a>
+        <a href="#links">Ссылки</a>
+        <a href="#schedule">Расписание</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero section-band">
+        <div class="hero-copy">
+          <p class="eyebrow">Twitch channel</p>
+          <h1>palatenco228</h1>
+          <p class="hero-text">
+            Место для лучших моментов, новых стримов и быстрых ссылок на весь контент.
+          </p>
+          <div class="hero-actions" aria-label="Основные действия">
+            <a class="button button-primary" href="https://www.twitch.tv/palatenco228" target="_blank" rel="noreferrer">
+              <span aria-hidden="true">▶</span>
+              Открыть Twitch
+            </a>
+            <a class="button button-ghost" href="#clips">
+              <span aria-hidden="true">▦</span>
+              Смотреть клипы
+            </a>
+          </div>
+        </div>
+
+        <aside class="channel-panel" aria-label="Статус канала">
+          <div class="avatar" aria-hidden="true">P</div>
+          <div>
+            <p class="panel-label">Канал</p>
+            <h2>palatenco228</h2>
+            <p id="liveStatus" class="live-status">Проверяем статус...</p>
+          </div>
+          <div class="mini-stats" aria-label="Краткая статистика">
+            <span><strong id="clipCount">6</strong> клипов</span>
+            <span><strong id="vodCount">4</strong> стрима</span>
+          </div>
+        </aside>
+      </section>
+
+      <section id="clips" class="content-section">
+        <div class="section-heading">
+          <p class="eyebrow">Highlights</p>
+          <h2>Клипы</h2>
+        </div>
+        <div id="clipsGrid" class="media-grid" aria-live="polite"></div>
+      </section>
+
+      <section id="streams" class="content-section section-band muted">
+        <div class="section-heading">
+          <p class="eyebrow">VOD</p>
+          <h2>Стримы</h2>
+        </div>
+        <div id="streamsGrid" class="media-grid stream-grid" aria-live="polite"></div>
+      </section>
+
+      <section id="links" class="content-section">
+        <div class="section-heading">
+          <p class="eyebrow">Follow</p>
+          <h2>YouTube и Twitch</h2>
+        </div>
+        <div class="link-grid">
+          <a class="social-tile twitch-tile" href="https://www.twitch.tv/palatenco228" target="_blank" rel="noreferrer">
+            <span class="tile-icon" aria-hidden="true">▶</span>
+            <span>
+              <strong>Twitch</strong>
+              <small>Прямые эфиры и чат</small>
+            </span>
+          </a>
+          <a id="youtubeLink" class="social-tile youtube-tile" href="#" target="_blank" rel="noreferrer">
+            <span class="tile-icon" aria-hidden="true">▷</span>
+            <span>
+              <strong>YouTube</strong>
+              <small>Видео, нарезки и архивы</small>
+            </span>
+          </a>
+        </div>
+      </section>
+
+      <section id="schedule" class="content-section section-band">
+        <div class="section-heading">
+          <p class="eyebrow">Next up</p>
+          <h2>Что дальше</h2>
+        </div>
+        <div class="feature-grid">
+          <article class="feature-card">
+            <h3>Расписание</h3>
+            <p>Сюда можно поставить дни стримов, таймер до эфира и статус “онлайн”.</p>
+          </article>
+          <article class="feature-card">
+            <h3>Топ моменты</h3>
+            <p>Отдельный блок для лучших клипов месяца, выбранных вручную или через API.</p>
+          </article>
+          <article class="feature-card">
+            <h3>Комьюнити</h3>
+            <p>Место под Discord, донаты, правила чата и любые ссылки, которые нужны зрителям.</p>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span>palatenco228 hub</span>
+      <a href="https://www.twitch.tv/palatenco228" target="_blank" rel="noreferrer">twitch.tv/palatenco228</a>
+    </footer>
+
+    <script src="./config.js"></script>
+    <script src="./app.js" type="module"></script>
+  </body>
+</html>

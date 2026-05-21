@@ -1,0 +1,15 @@
+{
+  "name": "palatenco228-twitch-hub",
+  "version": "1.0.0",
+  "description": "Twitch hub site for palatenco228 with optional Twitch Helix API proxy.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "check": "node --check server.js && node --check public/app.js"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "license": "UNLICENSED",
+  "private": true
+}
