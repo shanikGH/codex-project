@@ -3,19 +3,23 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="YouTube hub канала palatenco228: новые видео, короткие ролики, статистика и ссылки." />
+    <meta
+      name="description"
+      content="YouTube hub канала palatenco228: видео, Shorts, Steam-зона, статистика и ссылки."
+    />
     <title>palatenco228 | YouTube Hub</title>
-    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="/styles.css?v=4" />
   </head>
   <body>
     <header class="site-header">
       <a class="brand" href="#top" aria-label="palatenco228">
-        <span class="brand-mark">▶</span>
+        <span class="brand-mark" aria-hidden="true">&#9658;</span>
         <span>palatenco228</span>
       </a>
       <nav class="nav" aria-label="Навигация">
         <a href="#videos">Видео</a>
         <a href="#shorts">Shorts</a>
+        <a href="#steam">Steam</a>
         <a href="#about">Канал</a>
         <a href="#links">Ссылки</a>
       </nav>
@@ -27,17 +31,22 @@
           <p class="eyebrow">YouTube channel</p>
           <h1 id="channelTitle">palatenco228</h1>
           <p id="channelDescription" class="hero-text">
-            Красивый хаб для канала: свежие видео, быстрые ссылки и место под будущие рубрики.
+            Иди смотри мои видео! Здесь собраны ролики, Shorts, игровые идеи и быстрые ссылки на канал.
           </p>
           <div class="hero-actions">
             <a id="youtubeButton" class="button button-primary" href="#" target="_blank" rel="noreferrer">
-              <span aria-hidden="true">▶</span>
+              <span aria-hidden="true">&#9658;</span>
               Открыть YouTube
             </a>
-            <a class="button button-light" href="#videos">
-              <span aria-hidden="true">▦</span>
-              Смотреть видео
+            <a class="button button-light" href="#steam">
+              <span aria-hidden="true">&#9881;</span>
+              Steam зона
             </a>
+          </div>
+          <div class="pulse-strip" aria-label="Творческий статус">
+            <span>Режим: монтаж</span>
+            <span>Формат: Shorts</span>
+            <span>Вайб: игры + мемы</span>
           </div>
         </div>
 
@@ -46,7 +55,7 @@
           <div>
             <p class="card-label">Канал</p>
             <h2 id="cardTitle">palatenco228</h2>
-            <p id="apiStatus" class="status">Ждем данные YouTube API...</p>
+            <p id="apiStatus" class="status">Загружаем данные YouTube API...</p>
           </div>
           <div class="stats">
             <span><strong id="subscriberCount">-</strong> подписчиков</span>
@@ -72,15 +81,49 @@
         <div id="shortsGrid" class="media-grid compact-grid" aria-live="polite"></div>
       </section>
 
+      <section id="steam" class="content-section steam-section">
+        <div class="steam-console">
+          <div class="steam-copy">
+            <p class="eyebrow">Steam corner</p>
+            <h2>Игровая база</h2>
+            <p>
+              Блок под Steam-профиль, любимые игры и идеи для роликов. Когда дашь ссылку на Steam,
+              кнопки сразу начнут вести туда.
+            </p>
+            <a id="steamButton" class="button steam-button" href="#" target="_blank" rel="noreferrer">
+              <span aria-hidden="true">&#8599;</span>
+              Открыть Steam
+            </a>
+          </div>
+          <div class="achievement-grid" aria-label="Игровые карточки">
+            <article class="achievement-card">
+              <span>01</span>
+              <h3>Team Fortress 2</h3>
+              <p>Идеально для багов, гайдов, смешных моментов и коротких нарезок.</p>
+            </article>
+            <article class="achievement-card">
+              <span>02</span>
+              <h3>Монтажный челлендж</h3>
+              <p>Собрать топовый edit из игры и вынести его в Shorts.</p>
+            </article>
+            <article class="achievement-card">
+              <span>03</span>
+              <h3>Следующий выпуск</h3>
+              <p>Место под будущую идею: обзор, мем, реакция или мини-гайд.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
       <section id="about" class="content-section split-section">
         <div>
-          <p class="eyebrow">Channel vibe</p>
+          <p class="eyebrow">Creator board</p>
           <h2>Что можно добавить дальше</h2>
         </div>
         <div class="feature-grid">
           <article class="feature-card">
             <h3>Плейлисты</h3>
-            <p>Отдельные подборки по рубрикам: лучшие моменты, реакции, гайды, нарезки.</p>
+            <p>Подборки по рубрикам: лучшие моменты, реакции, гайды и нарезки.</p>
           </article>
           <article class="feature-card">
             <h3>Топ видео</h3>
@@ -88,7 +131,7 @@
           </article>
           <article class="feature-card">
             <h3>Анонсы</h3>
-            <p>Место под расписание, премьеры, новые серии и важные обновления канала.</p>
+            <p>Расписание, премьеры, новые серии и важные обновления канала.</p>
           </article>
         </div>
       </section>
@@ -100,14 +143,21 @@
         </div>
         <div class="link-grid">
           <a id="youtubeTile" class="social-tile" href="#" target="_blank" rel="noreferrer">
-            <span class="tile-icon" aria-hidden="true">▶</span>
+            <span class="tile-icon" aria-hidden="true">&#9658;</span>
             <span>
               <strong>YouTube</strong>
-              <small>Основной канал</small>
+              <small>Основной канал и Shorts</small>
+            </span>
+          </a>
+          <a id="steamTile" class="social-tile steam-tile" href="#" target="_blank" rel="noreferrer">
+            <span class="tile-icon" aria-hidden="true">&#9881;</span>
+            <span>
+              <strong>Steam</strong>
+              <small>Профиль и игры</small>
             </span>
           </a>
           <a id="telegramTile" class="social-tile pale" href="#" target="_blank" rel="noreferrer">
-            <span class="tile-icon" aria-hidden="true">↗</span>
+            <span class="tile-icon" aria-hidden="true">&#8599;</span>
             <span>
               <strong>Telegram</strong>
               <small>Можно подключить позже</small>
@@ -119,10 +169,10 @@
 
     <footer class="footer">
       <span>palatenco228 YouTube Hub</span>
-      <span>Powered by YouTube Data API</span>
+      <span>YouTube API + Steam zone</span>
     </footer>
 
-    <script src="./config.js"></script>
-    <script src="./app.js" type="module"></script>
+    <script src="/config.js?v=4"></script>
+    <script src="/app.js?v=4" type="module"></script>
   </body>
 </html>

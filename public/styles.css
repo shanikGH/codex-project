@@ -156,6 +156,23 @@ h3 {
   margin-top: 2rem;
 }
 
+.pulse-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 1.3rem;
+}
+
+.pulse-strip span {
+  padding: 0.55rem 0.75rem;
+  border: 1px solid rgba(230, 33, 23, 0.18);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--red);
+  font-size: 0.84rem;
+  font-weight: 900;
+}
+
 .button {
   display: inline-flex;
   align-items: center;
@@ -345,6 +362,94 @@ h3 {
   color: var(--ink);
 }
 
+.steam-section {
+  background:
+    linear-gradient(135deg, #111827 0%, #172338 56%, #0d1118 100%);
+  color: #fff;
+}
+
+.steam-console {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.72fr) minmax(0, 1.28fr);
+  gap: clamp(1rem, 4vw, 2rem);
+  align-items: stretch;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.steam-copy {
+  display: grid;
+  align-content: center;
+  gap: 1rem;
+  min-height: 360px;
+  padding: clamp(1.2rem, 3vw, 1.7rem);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.04)),
+    rgba(255, 255, 255, 0.04);
+}
+
+.steam-copy .eyebrow {
+  color: #74d6ff;
+}
+
+.steam-copy h2 {
+  color: #fff;
+}
+
+.steam-copy p {
+  margin-bottom: 0;
+  color: rgba(255, 255, 255, 0.76);
+  line-height: 1.58;
+}
+
+.steam-button {
+  width: fit-content;
+  border-color: rgba(116, 214, 255, 0.5);
+  background: #74d6ff;
+  color: #06111d;
+}
+
+.achievement-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.achievement-card {
+  display: grid;
+  align-content: end;
+  min-height: 360px;
+  padding: 1.1rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(116, 214, 255, 0.18), rgba(230, 33, 23, 0.18)),
+    rgba(255, 255, 255, 0.06);
+}
+
+.achievement-card span {
+  width: fit-content;
+  margin-bottom: auto;
+  padding: 0.42rem 0.58rem;
+  border-radius: 8px;
+  background: rgba(116, 214, 255, 0.14);
+  color: #74d6ff;
+  font-size: 0.78rem;
+  font-weight: 950;
+}
+
+.achievement-card h3 {
+  color: #fff;
+}
+
+.achievement-card p {
+  margin-bottom: 0;
+  color: rgba(255, 255, 255, 0.72);
+  line-height: 1.48;
+}
+
 .split-section {
   display: grid;
   grid-template-columns: minmax(240px, 0.7fr) minmax(0, 1.3fr);
@@ -374,7 +479,7 @@ h3 {
 }
 
 .link-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .social-tile {
@@ -390,6 +495,11 @@ h3 {
 
 .social-tile.pale {
   background: var(--red-soft);
+}
+
+.social-tile.steam-tile {
+  background: #172338;
+  color: #fff;
 }
 
 .social-tile strong,
@@ -437,7 +547,10 @@ h3 {
   .media-grid,
   .compact-grid,
   .feature-grid,
-  .split-section {
+  .split-section,
+  .steam-console,
+  .achievement-grid,
+  .link-grid {
     grid-template-columns: 1fr 1fr;
   }
 
@@ -467,6 +580,8 @@ h3 {
   .compact-grid,
   .feature-grid,
   .split-section,
+  .steam-console,
+  .achievement-grid,
   .link-grid {
     grid-template-columns: 1fr;
   }
@@ -487,6 +602,15 @@ h3 {
 
   .button {
     width: 100%;
+  }
+
+  .steam-button {
+    width: 100%;
+  }
+
+  .steam-copy,
+  .achievement-card {
+    min-height: auto;
   }
 
   .footer {

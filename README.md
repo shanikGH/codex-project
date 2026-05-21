@@ -77,6 +77,12 @@ CORS_ORIGIN=https://your-domain.ru
 apiBaseUrl: "https://your-service.onrender.com",
 ```
 
+Steam-ссылку можно добавить там же:
+
+```js
+steamUrl: "https://steamcommunity.com/id/your-profile",
+```
+
 Если фронтенд и backend живут вместе на Render, оставь:
 
 ```js

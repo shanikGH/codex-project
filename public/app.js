@@ -1,5 +1,6 @@
 const config = window.CHANNEL_CONFIG || {};
 const API_BASE_URL = (config.apiBaseUrl || "").replace(/\/$/, "");
+const CACHE_KEY = "palatenco228-youtube-data-v1";
 
 const mockChannel = {
   title: "palatenco228",
@@ -163,7 +164,25 @@ function setLink(selector, url) {
   }
 }
 
-function renderChannel(channel, fromApi) {
+function readCachedData() {
+  try {
+    const cached = JSON.parse(localStorage.getItem(CACHE_KEY) || "null");
+    if (!cached?.channel || !Array.isArray(cached?.videos)) return null;
+    return cached;
+  } catch (error) {
+    return null;
+  }
+}
+
+function saveCachedData(channel, videos) {
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify({ channel, videos, savedAt: Date.now() }));
+  } catch (error) {
+    // Local storage can be blocked in private mode; the site should still work.
+  }
+}
+
+function renderChannel(channel, fromApi, statusText) {
   const title = channel.title || "palatenco228";
   const description = channel.description || mockChannel.description;
   const url = config.youtubeUrl || channel.url;
@@ -174,9 +193,14 @@ function renderChannel(channel, fromApi) {
   setText("#subscriberCount", formatNumber(channel.statistics?.subscriberCount));
   setText("#videoCount", formatNumber(channel.statistics?.videoCount));
   setText("#viewCount", formatNumber(channel.statistics?.viewCount));
-  setText("#apiStatus", fromApi ? "Данные подключены через YouTube API" : "Пока показываем демо-данные");
+  setText(
+    "#apiStatus",
+    statusText || (fromApi ? "Данные подключены через YouTube API" : "Загружаем данные YouTube API..."),
+  );
   setLink("#youtubeButton", url);
   setLink("#youtubeTile", url);
+  setLink("#steamButton", config.steamUrl);
+  setLink("#steamTile", config.steamUrl);
   setLink("#telegramTile", config.telegramUrl);
 
   const avatar = document.querySelector("#avatar");
@@ -214,6 +238,8 @@ async function getJson(path) {
 }
 
 async function loadData() {
+  const cached = readCachedData();
+
   try {
     const [channel, videos] = await Promise.all([
       getJson("/api/youtube/channel"),
@@ -221,12 +247,25 @@ async function loadData() {
     ]);
     renderChannel(channel, true);
     renderVideos(videos);
+    saveCachedData(channel, videos);
   } catch (error) {
-    renderChannel(mockChannel, false);
+    if (cached) {
+      renderChannel(cached.channel, true, "Данные из кэша, API обновится позже");
+      renderVideos(cached.videos);
+      return;
+    }
+
+    renderChannel(mockChannel, false, "API пока недоступен, показываем демо");
     renderVideos(mockVideos);
   }
 }
 
-renderChannel(mockChannel, false);
-renderVideos(mockVideos);
+const cached = readCachedData();
+if (cached) {
+  renderChannel(cached.channel, true, "Данные из кэша, обновляем API...");
+  renderVideos(cached.videos);
+} else {
+  renderChannel(mockChannel, false, "Загружаем данные YouTube API...");
+  renderVideos(mockVideos);
+}
 loadData();
